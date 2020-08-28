@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html class="no-js" lang="{{ shop.locale }}">
+<head>
+   {%- comment -%}CONFIGURATION START{%- endcomment -%}
+
+  {%- comment -%}Google Tag Manager container ID.{%- endcomment -%}
+  {% assign GTM-ID = "GTM-PMJ2WDW" -%}
+
+  {%- comment -%}CONFIGURATION END - DO NOT EDIT ANYTHING BELOW THIS LINE{%- endcomment -%}
+
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  </script>
+  <!-- Anti-flicker snippet (recommended)  -->
+  <style>.async-hide { opacity: 0 !important} </style>
+  <script>(function(a,s,y,n,c,h,i,d,e){s.className+=' '+y;h.start=1*new Date;
+  h.end=i=function(){s.className=s.className.replace(RegExp(' ?'+y),'')};
+  (a[n]=a[n]||[]).hide=h;setTimeout(function(){i();h.end=null},c);h.timeout=c;
+  })(window,document.documentElement,'async-hide','dataLayer',4000,
+  {'{{ GTM-ID }}':true});
+  <!-- Google Tag Manager -->
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','{{ GTM-ID }}');
+  <!-- End Google Tag Manager -->
+  </script>
+  
+  
+  
+  <!-- Symmetry 4.6.2 -->
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="theme-color" content="{{ settings.btn_col }}">
+
+  {% if settings.favicon != blank and settings.favicon contains '.png' %}
+  <link rel="shortcut icon" href="{{ settings.favicon | img_url: 'master' }}" type="image/png" />
+  {% elsif settings.favicon != blank and settings.favicon contains '.ico' %}
+  <link rel="shortcut icon" href="{{ settings.favicon | img_url: 'master' }}" type="image/x-icon" />
+  {% endif %}
+
+  <title>
+    {{ page_title }}{% if current_tags %}{% assign meta_tags = current_tags | join: ', ' %} &ndash; {{ 'general.meta.tags' | t: tags: meta_tags }}{% endif %}{% if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif %}{% unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless %}
+  </title>
+  {% if page_description %}
+  <meta name="description" content="{{ page_description | escape }}" />
+  {% endif %}
+  <link rel="canonical" href="{{ canonical_url }}" />
+
+  {% include 'social-meta-tags' %}
+
+  {{ 'styles.scss.css' | asset_url | stylesheet_tag }}
+
+  {{ 'https://code.jquery.com/jquery-3.3.1.min.js' | script_tag }}
+  <script>
+    window.theme = window.theme || {};
+    theme.jQuery = jQuery;
+    theme.money_format = {{ shop.money_format | json }};
+    theme.money_container = '.theme-money';
+    theme.strings = {
+      previous: {{ 'general.accessibility_labels.previous' | t | json }},
+      next: {{ 'general.accessibility_labels.next' | t | json }}
+    };
+    document.documentElement.className = document.documentElement.className.replace('no-js', '');
+  </script>
+
+  {% if template contains 'customers' %}
+    {{ "shopify_common.js" | shopify_asset_url | script_tag }}
+    {{ "customer_area.js"  | shopify_asset_url | script_tag }}
+  {% endif %}
+
+  {{ content_for_header }}
+{%- include 'bold-common' -%}
+
+	{{ shop.metafields.loox["global_html_head"] }}
+  <meta name="p:domain_verify" content="2d39814fde6ff34c078e1eff94b18ea7"/>
+</head>
+
+<body class="template-{{ template | split: '.' | first }}">
+  
+   <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ GTM-ID }}"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+
+  <!-- google dynamic remarketing tag for theme.liquid Start -->
+  {% if template contains 'product' %}
+      <script>
+          var variant_ids_array = [];
+          var variant_ids_string = '{{ product.variants | map: 'id' | join: "," }}';
+          if (variant_ids_string != null) {
+              if (variant_ids_string.indexOf(',') > -1) {
+                  variant_ids_array = variant_ids_string.split(',');
+              } else {
+                  variant_ids_array = variant_ids_string;
+              }
+          }
+
+          var google_tag_params = {
+              dynx_itemid: {{ product.id }},
+              dynx_itemid2: variant_ids_array,
+              dynx_pagetype: 'offerdetail',
+              dynx_totalvalue: parseFloat('{{ product.price | money_without_currency | remove: "," }}')
+          };
+      </script>
+  {% elsif template contains 'collection' %}
+      <script>
+          var google_tag_params = {
+              dynx_pagetype: '{{ collection.handle | replace: "'", "\\'" }}'
+          };
+      </script>
+      <script>
+          window.dataLayer = window.dataLayer || [];
+          window.gtmProducts = {};
+          window.gtmMaxProducts = 15;
+
+          function gtmAddListener(element, type, callback) {
+              if (element.addEventListener) {
+                  element.addEventListener(type, callback);
+              } else if (element.attachEvent) {
+                  element.attachEvent('on' + type, callback);
+              }
+          }
+
+          function gtmClickHandler(event) {
+              event = event || window.event;
+              var target = event.target || event.srcElement;
+
+              if (target && target.getAttribute('href')) {
+                  var href = target.getAttribute('href');
+
+                  var idx = href.indexOf('/products/');
+                  var key = href.substring(idx);
+
+                  if (typeof window.gtmProducts[key] !== undefined) {
+                      var prods = [...window.gtmProducts[key]]
+
+                      while (prods.length) {
+                          var p1 = prods.splice(0, window.gtmMaxProducts);
+
+                          dataLayer.push({
+                              event: 'shopifyImpressionClick',
+                              ecommerce: {
+                                  click: {
+                                      actionField: {
+                                          list: '{{ collection.title | replace: "'", "\\'" }}'
+                                      },
+                                      products: p1
+                                  }
+                              }
+                          });
+                      }
+                  }
+              }
+          }
+
+          gtmAddListener(window, 'load', function() {
+              for (var i = 0; i < document.links.length; i++) {
+                  var href = document.links[i].getAttribute('href');
+                  if (href && href.indexOf('/products/') >= 0) {
+                      gtmAddListener(document.links[i], 'click', gtmClickHandler);
+                  }
+              }
+          });
+
+          {% assign count = 1 %}
+          {% for product in collection.products %}
+              window.gtmProducts['{{ product.url | replace: "'", "\\'" }}'] = [
+                  {% for variant in product.variants %}
+                      {
+                      {% if product.has_only_default_variant or variant.title == "" or variant.title == nil %}
+                          'name': '{{ product.title | replace: "'", "\\'" }}',
+                      {% else %}
+                          'name': '{{ product.title | replace: "'", "\\'" }} - {{ variant.title | replace: "'", "\\'" }}',
+                      {% endif %}
+                      'id': '{{ variant.sku | replace: "'", "\\'" }}' || '{{ variant.id | replace: "'", "\\'" }}',
+                      'price': '{{ variant.price | money_without_currency | remove: ","  }}',
+                      'brand': '{{ product.vendor | replace: "'", "\\'" }}',
+                      'category': '{{ product.type | replace: "'", "\\'" }}',
+                      {% unless product.has_only_default_variant %}
+                          'variant': '{{ variant.title | replace: "'", "\\'" }}',
+                      {% endunless %}
+                      'list': '{{ collection.title | replace: "'", "\\'" }}',
+                      'position': {{ count }}
+                      },
+                  {% endfor %}
+              ];
+              {% assign count = count | plus: 1 %}
+          {% endfor %}
+
+          var prods = [].concat.apply([], Object.values(window.gtmProducts))
+
+          while (prods.length) {
+              var p1 = prods.splice(0, window.gtmMaxProducts);
+
+              dataLayer.push({
+                  'event': 'shopifyImpressionView',
+                  'ecommerce': {
+                      'currencyCode': '{{ shop.currency | replace: "'", "\\'" }}',
+                      'impressions': p1
+                  }
+              });
+          }
+      </script>
+  {% elsif template contains 'cart' %}
+      <script>
+          var id = [];
+          var id2 = [];
+          {% for item in cart.items %}
+              id.push('{{ item.product_id }}');
+              id2.push('{{ item.variant.id }}');
+          {% endfor %}
+
+          var google_tag_params = {
+              dynx_itemid: id,
+              dynx_itemid2: id2,
+              dynx_pagetype: 'conversionintent',
+              dynx_totalvalue: parseFloat('{{ cart.total_price | money_without_currency | remove: "," }}')
+          };
+      </script>
+  {% elsif template contains 'search' %}
+      <script>
+          var google_tag_params = {
+              dynx_pagetype: 'searchresults'
+          };
+      </script>
+      <script>
+          window.dataLayer = window.dataLayer || [];
+          window.gtmProducts = {};
+          window.gtmMaxProducts = 15;
+
+          function gtmAddListener(element, type, callback) {
+              if (element.addEventListener) {
+                  element.addEventListener(type, callback);
+              } else if (element.attachEvent) {
+                  element.attachEvent('on' + type, callback);
+              }
+          }
+
+          function gtmClickHandler(event) {
+              event = event || window.event;
+              var target = event.target || event.srcElement;
+
+              if (target && target.getAttribute('href')) {
+                  var href = target.getAttribute('href');
+
+                  var idx = href.indexOf('/products/');
+                  var key = href.substring(idx);
+
+                  if (typeof window.gtmProducts[key] !== undefined) {
+                      var prods = [...window.gtmProducts[key]]
+
+                      while (prods.length) {
+                          var p1 = prods.splice(0, window.gtmMaxProducts);
+
+                          dataLayer.push({
+                              event: 'shopifyImpressionClick',
+                              ecommerce: {
+                                  click: {
+                                      actionField: {
+                                          list: 'Search Results'
+                                      },
+                                      products: p1
+                                  }
+                              }
+                          });
+                      }
+                  }
+              }
+          }
+
+          gtmAddListener(window, 'load', function() {
+              for (var i = 0; i < document.links.length; i++) {
+                  var href = document.links[i].getAttribute('href');
+                  if (href && href.indexOf('/products/') >= 0) {
+                      gtmAddListener(document.links[i], 'click', gtmClickHandler);
+                  }
+              }
+          });
+
+          {% assign count = 1 %}
+          {% for product in search.results %}
+              {% if product.object_type == 'product' %}
+                  window.gtmProducts['{{ product.url | replace: "'", "\\'" }}'] = [
+                      {% for variant in product.variants %}
+                          {
+                          {% if product.has_only_default_variant or variant.title == "" or variant.title == nil %}
+                              'name': '{{ product.title | replace: "'", "\\'" }}',
+                          {% else %}
+                              'name': '{{ product.title | replace: "'", "\\'" }}  - {{ variant.title | replace: "'", "\\'" }}',
+                          {% endif %}
+                          'id': '{{ variant.sku | replace: "'", "\\'" }}' || '{{ variant.id | replace: "'", "\\'" }}',
+                          'price': '{{ variant.price | money_without_currency | remove: "," }}',
+                          'brand': '{{ product.vendor | replace: "'", "\\'" }}',
+                          'category': '{{ product.type | replace: "'", "\\'" }}',
+                          {% unless product.has_only_default_variant %}
+                              'variant': '{{ variant.title | replace: "'", "\\'" }}',
+                          {% endunless %}
+                          'list': 'Search Results',
+                          'position': {{ count }}
+                          },
+                      {% endfor %}
+                  ];
+                  {% assign count = count | plus: 1 %}
+              {% endif %}
+          {% endfor %}
+
+          var prods = [].concat.apply([], Object.values(window.gtmProducts))
+
+          while (prods.length) {
+              var p1 = prods.splice(0, window.gtmMaxProducts);
+
+              dataLayer.push({
+                  'event': 'shopifyImpressionView',
+                  'ecommerce': {
+                      'currencyCode': '{{ shop.currency | replace: "'", "\\'" }}',
+                      'impressions': p1
+                  }
+              });
+          }
+      </script>
+  {% elsif template contains 'index' %}
+      <script>
+          var google_tag_params = {
+              dynx_pagetype: 'home'
+          };
+      </script>
+  {% else %}
+      <script>
+          var google_tag_params = {
+              dynx_pagetype: 'other'
+          };
+      </script>
+  {% endif %}
+  <script>
+  window.dataLayer = window.dataLayer || [];
+  dataLayer.push ({
+      'event':'shopifyRemarketing',
+      'google_tag_params': window.google_tag_params
+  });
+  </script>
+  <!-- google dynamic remarketing tag for theme.liquid End -->
+
+  
+  <a class="skip-link visually-hidden" href="#content">{{ 'general.accessibility_labels.skip_to_content' | t }}</a>
+
+  {% section 'header' %}
+
+  <main id="content" role="main">
+    <div class="container cf">
+
+      {{ content_for_layout }}
+
+    </div><!-- /.container -->
+  </main><!-- /#content -->
+
+  <div id="pagefooter">
+    {% section 'cross-page-promos' %}
+
+    {% section 'footer' %}
+  </div><!-- /#pagefooter -->
+
+  {{ 'vendor.js'  | asset_url | script_tag }}
+  {{ 'theme.js'  | asset_url | script_tag }}
+
+  {% include 'currencies' %}
+
+{% render 'banana-stand-footer' %}
+
+	{{ shop.metafields.loox["global_html_body"] }}
+
+{% include 'swymSnippet' %}
+
+
+<!-- Back in Stock helper snippet -->
+{% render 'back-in-stock-helper' %}
+<!-- End Back in Stock helper snippet -->
+ {% include 'smile-initializer' %}
+
+</body>
+</html>
+
+<!-- Start of Afterpay assets -->
+<!-- Begin Shopify-Afterpay JavaScript Snippet (v1.0.4) -->
+<script type="text/javascript">
+  var afterpay_logo_theme = 'colour'; // 'colour', 'black' or 'white'.
+  var afterpay_product_selector = '.price-container';
+  var afterpay_cart_static_selector = '.subtotal';
+  var afterpay_min = 35;
+  var afterpay_max = 1000;
+  var afterpay_show_currency_code = false;
+  var afterpay_modal_responsive = false;
+  var afterpay_modal_open_icon = true;
+  var afterpay_hide_upper_limit = true;
+
+  var afterpay_shop_currency = {{ shop.currency | json }};
+  var afterpay_shop_money_format = {{ shop.money_format | json }};
+  var afterpay_shop_permanent_domain = {{ shop.permanent_domain | json }};
+  var afterpay_theme_name = {{ theme.name | json }};
+  var afterpay_product = {{ product | json }};
+  var afterpay_current_variant = {{ product.selected_or_first_available_variant | json }};
+  var afterpay_cart_total_price = {{ cart.total_price | json }};
+  var afterpay_js_snippet_version = '1.0.4';
+  const cartItems = {{ cart.items | json }};
+  const isGiftCard = (item) => item.product_type === "Gift Card";
+  
+  if(afterpay_product && afterpay_product.type === "Gift Card") {
+    afterpay_product_selector = '';
+  }
+  
+  if(cartItems && cartItems.some(isGiftCard)) {
+	afterpay_cart_static_selector = '';
+  }
+</script>
+
+<script type="text/javascript" src="https://static.afterpay.com/shopify-afterpay-javascript.js"></script>
+<!-- End Shopify-Afterpay JavaScript Snippet (v1.0.4) -->
+<style type="text/css">
+  .afterpay-logo {
+    width: 5.5em !important;
+    height: auto !important;
+  }
+  .afterpay-paragraph {
+  	font-size: 0.9em;
+	margin-bottom: 18px !important;
+  }
+  #shopify-section-cart-template .afterpay-paragraph {
+  }
+  .afterpay-link-inner, .afterpay-link { 
+    text-decoration: none; 
+  }
+</style>
+<!-- End of Afterpay assets -->
